@@ -3,6 +3,8 @@ from rest_framework import views
 from django.contrib.auth import get_user_model
 from apps.h5.serializers import LoginSerializer
 from apps.h5.throttles import SMSCodeRateThrottle
+from apps.meituan.models import Merchant
+from apps.meituan.serializers import MerchantSerializer
 from apps.mtauth.authentications import generate_jwt
 from apps.mtauth.serializers import UserSerializer
 from utils.CCPSDK import CCPRestSDK
@@ -10,6 +12,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.core.cache import cache
 from django.utils.timezone import now
+from rest_framework import viewsets
+from rest_framework import mixins
+from rest_framework.pagination import PageNumberPagination
 
 User = get_user_model()
 
@@ -68,3 +73,18 @@ class LoginView(views.APIView):
             return Response({"user": serializer.data, "token": token})
         else:
             return Response(data={"message": dict(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MerchantPagination(PageNumberPagination):
+    page_size = 10
+    page_query_param = 'page'
+
+
+class MerchantViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin
+):
+    queryset = Merchant.objects.all()
+    serializer_class = MerchantSerializer
+    pagination_class = MerchantPagination
