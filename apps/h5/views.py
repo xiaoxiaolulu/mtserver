@@ -15,6 +15,8 @@ from django.utils.timezone import now
 from rest_framework import viewsets
 from rest_framework import mixins
 from rest_framework.pagination import PageNumberPagination
+from rest_framework import generics
+from rest_framework import filters
 
 User = get_user_model()
 
@@ -88,3 +90,14 @@ class MerchantViewSet(
     queryset = Merchant.objects.all()
     serializer_class = MerchantSerializer
     pagination_class = MerchantPagination
+
+
+class MerchantSearchView(generics.ListAPIView):
+
+    class MerchantSearchFilter(filters.SearchFilter):
+        search_param = 'q'
+
+    queryset = Merchant.objects.all()
+    serializer_class = MerchantSerializer
+    filter_backends = [MerchantSearchFilter]
+    search_fields = ['name', 'categories__name', 'categories__goods_list__name']
