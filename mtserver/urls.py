@@ -19,5 +19,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('', include('apps.h5.urls')),
     path('cms/', include('apps.cms.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
